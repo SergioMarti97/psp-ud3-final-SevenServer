@@ -27,7 +27,7 @@ public class Deck {
         return cards;
     }
 
-    private Card takeCard() {
+    public Card takeCard() {
         if (cards.isEmpty()) {
             return null;
         }
