@@ -17,8 +17,6 @@ public class PlayerThread extends Thread implements Comparable<PlayerThread> {
 
     private float points;
 
-    private int position;
-
     private boolean keepRunning;
 
     public PlayerThread(Socket socket, ObjectOutputStream objectOutputStream, ObjectInputStream objectInputStream) {
@@ -36,7 +34,7 @@ public class PlayerThread extends Thread implements Comparable<PlayerThread> {
                 bodyOptions();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         } finally {
             Main.playersInGame.remove(this);
             System.out.println("Player disconnected: " + socket);
@@ -55,6 +53,9 @@ public class PlayerThread extends Thread implements Comparable<PlayerThread> {
                 break;
             case "getResult":
                 getResult();
+                break;
+            case "standUp":
+                standUp();
                 break;
         }
     }
@@ -82,18 +83,21 @@ public class PlayerThread extends Thread implements Comparable<PlayerThread> {
     }
 
     private void getResult() throws IOException {
+        objectOutputStream.writeUTF("getResult");
+
         if (Main.playersInGame.isEmpty()) {
             Main.getPlayersResult();
             if (Main.playerWinner == null) {
-                objectOutputStream.writeUTF("Draw");
+                objectOutputStream.writeUTF("draw");
             } else if (Main.playerWinner == this) {
-                objectOutputStream.writeUTF("Win");
+                objectOutputStream.writeUTF("win");
             } else {
-                objectOutputStream.writeUTF("Lose");
+                objectOutputStream.writeUTF("lose");
             }
         } else {
-            objectOutputStream.writeBoolean(false);
+            objectOutputStream.writeUTF("inProgress");
         }
+
         objectOutputStream.flush();
     }
 
@@ -101,23 +105,33 @@ public class PlayerThread extends Thread implements Comparable<PlayerThread> {
         String command = objectInputStream.readUTF();
         switch (command) {
             case "receiveMoreCards":
-                System.out.println("receive card");
-                Card card = Main.deck.takeCard();
-                points += card.getSymbol().getPoints();
-                objectOutputStream.writeUTF("receiveMoreCards");
-                objectOutputStream.flush();
-                objectOutputStream.writeObject(card);
-                objectOutputStream.flush();
+                receiveMoreCards();
                 break;
             case "standUp":
-                System.out.println("stand up");
-                Main.playersInGame.remove(this);
-                Main.playersStandUp.add(this);
+                standUp();
                 break;
             case "disconnect":
                 disconnect();
                 break;
         }
+    }
+
+    private void receiveMoreCards() throws IOException {
+        System.out.println("receive card");
+        Card card = Main.deck.takeCard();
+        points += card.getSymbol().getPoints();
+        objectOutputStream.writeUTF("receiveMoreCards");
+        objectOutputStream.flush();
+        objectOutputStream.writeObject(card);
+        objectOutputStream.flush();
+    }
+
+    private void standUp() throws IOException {
+        System.out.println("stand up");
+        objectOutputStream.writeUTF("standUp");
+        objectOutputStream.flush();
+        Main.playersInGame.remove(this);
+        Main.playersStandUp.add(this);
     }
 
     public float getPoints() {
@@ -127,9 +141,9 @@ public class PlayerThread extends Thread implements Comparable<PlayerThread> {
     @Override
     public int compareTo(PlayerThread o) {
         if (this.points > o.points) {
-            return this.points > 7.5f ? -1 : 1;
+            return this.points > 7.5f ? 1 : -1;
         } else if (this.points < o.points) {
-            return o.points > 7.5f ? 1 : -1;
+            return o.points > 7.5f ? -1 : 1;
         }
 
         return 0;

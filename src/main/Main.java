@@ -46,7 +46,7 @@ public class Main {
     }
 
     public static void generateNextPlayerTurn() {
-        if (playerTurn + 1 == playersInGame.size()) {
+        if (playerTurn + 1 >= playersInGame.size()) {
             playerTurn = 0;
             return;
         }
@@ -54,14 +54,16 @@ public class Main {
     }
 
     public static void getPlayersResult() {
-        if (playersResult != null && !playersResult.isEmpty()) {
+        if (!playersInGame.isEmpty()) {
             return;
         }
 
         playersResult = new ArrayList<>(playersStandUp);
         Collections.sort(playersResult);
 
-        if (playersResult.get(0).getPoints() > playersResult.get(1).getPoints()) {
+        if (playersResult.size() == 1) {
+            playerWinner = playersResult.get(0);
+        } else if (playersResult.get(0).getPoints() > playersResult.get(1).getPoints()) {
             playerWinner = playersResult.get(0);
         } else {
             playerWinner = null;
