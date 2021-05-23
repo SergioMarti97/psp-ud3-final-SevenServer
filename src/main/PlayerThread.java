@@ -71,7 +71,7 @@ public class PlayerThread extends Thread implements Comparable<PlayerThread> {
         objectOutputStream.writeUTF("getTurn");
         objectOutputStream.flush();
 
-        if (Main.playersInGame.get(Main.playerTurn).equals(this)) {
+        if (Main.isTurnPlayer(this)) {
             objectOutputStream.writeBoolean(true);
             objectOutputStream.flush();
             doTurn();

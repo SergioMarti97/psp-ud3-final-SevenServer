@@ -53,6 +53,13 @@ public class Main {
         playerTurn++;
     }
 
+    public static boolean isTurnPlayer(PlayerThread player) {
+        while (playerTurn >= playersInGame.size()) {
+            playerTurn--;
+        }
+        return Main.playersInGame.get(Main.playerTurn).equals(player);
+    }
+
     public static void getPlayersResult() {
         if (!playersInGame.isEmpty()) {
             return;
@@ -63,10 +70,10 @@ public class Main {
 
         if (playersResult.size() == 1) {
             playerWinner = playersResult.get(0);
-        } else if (playersResult.get(0).getPoints() > playersResult.get(1).getPoints()) {
-            playerWinner = playersResult.get(0);
-        } else {
+        } else if (playersResult.get(0).getPoints() == playersResult.get(1).getPoints()) {
             playerWinner = null;
+        } else {
+            playerWinner = playersResult.get(0);
         }
 
     }
