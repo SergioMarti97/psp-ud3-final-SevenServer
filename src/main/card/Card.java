@@ -1,6 +1,8 @@
 package main.card;
 
-public class Card {
+import java.io.Serializable;
+
+public class Card implements Serializable {
 
     private Club club;
 
@@ -23,4 +25,5 @@ public class Card {
     public String toString() {
         return symbol.getNumber() + " of " + club.getName();
     }
+
 }

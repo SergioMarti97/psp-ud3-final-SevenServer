@@ -17,6 +17,8 @@ public class Main {
 
     public static int playerTurn = 0;
 
+    public static PlayerThread playerWinner;
+
     public static Deck deck;
 
     private final static int SERVER_PORT = 6000;
@@ -51,14 +53,20 @@ public class Main {
         playerTurn++;
     }
 
-    public static List<PlayerThread> getPlayersResult() {
+    public static void getPlayersResult() {
         if (playersResult != null && !playersResult.isEmpty()) {
-            return playersResult;
+            return;
         }
 
         playersResult = new ArrayList<>(playersStandUp);
         Collections.sort(playersResult);
-        return playersResult;
+
+        if (playersResult.get(0).getPoints() > playersResult.get(1).getPoints()) {
+            playerWinner = playersResult.get(0);
+        } else {
+            playerWinner = null;
+        }
+
     }
 
 }
